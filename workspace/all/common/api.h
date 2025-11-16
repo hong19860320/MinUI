@@ -58,6 +58,7 @@ extern uint32_t RGB_BLACK;
 extern uint32_t RGB_LIGHT_GRAY;
 extern uint32_t RGB_GRAY;
 extern uint32_t RGB_DARK_GRAY;
+extern uint32_t RGB_ORANGE;
 
 enum {
 	ASSET_WHITE_PILL,

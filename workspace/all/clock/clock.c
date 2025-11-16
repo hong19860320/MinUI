@@ -248,9 +248,9 @@ int main(int argc , char* argv[]) {
 			GFX_blitHardwareGroup(screen, show_setting);
 			
 			if (show_setting) GFX_blitHardwareHints(screen, show_setting);
-			else GFX_blitButtonGroup((char*[]){ "SELECT",show_24hour?"12 HOUR":"24 HOUR", NULL }, 0, screen, 0);
+			else GFX_blitButtonGroup((char*[]){ "SELECT",show_24hour?"12 小时":"24 小时", NULL }, 0, screen, 0);
 
-			GFX_blitButtonGroup((char*[]){ "B","CANCEL", "A","SET", NULL }, 1, screen, 1);
+			GFX_blitButtonGroup((char*[]){ "B","返回", "A","确认", NULL }, 1, screen, 1);
 		
 			// 376 or 446 (@2x)
 			// 188 or 223 (@1x)

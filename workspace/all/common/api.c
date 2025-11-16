@@ -54,6 +54,7 @@ uint32_t RGB_BLACK;
 uint32_t RGB_LIGHT_GRAY;
 uint32_t RGB_GRAY;
 uint32_t RGB_DARK_GRAY;
+uint32_t RGB_ORANGE;
 
 static struct GFX_Context {
 	SDL_Surface* screen;
@@ -104,16 +105,17 @@ SDL_Surface* GFX_init(int mode) {
 	RGB_LIGHT_GRAY	= SDL_MapRGB(gfx.screen->format, TRIAD_LIGHT_GRAY);
 	RGB_GRAY		= SDL_MapRGB(gfx.screen->format, TRIAD_GRAY);
 	RGB_DARK_GRAY	= SDL_MapRGB(gfx.screen->format, TRIAD_DARK_GRAY);
+	RGB_ORANGE	    = SDL_MapRGB(gfx.screen->format, TRIAD_ORANGE);
 	
-	asset_rgbs[ASSET_WHITE_PILL]	= RGB_WHITE;
+	asset_rgbs[ASSET_WHITE_PILL]	= RGB_ORANGE;
 	asset_rgbs[ASSET_BLACK_PILL]	= RGB_BLACK;
 	asset_rgbs[ASSET_DARK_GRAY_PILL]= RGB_DARK_GRAY;
 	asset_rgbs[ASSET_OPTION]		= RGB_DARK_GRAY;
-	asset_rgbs[ASSET_BUTTON]		= RGB_WHITE;
-	asset_rgbs[ASSET_PAGE_BG]		= RGB_WHITE;
-	asset_rgbs[ASSET_STATE_BG]		= RGB_WHITE;
+	asset_rgbs[ASSET_BUTTON]		= RGB_ORANGE;
+	asset_rgbs[ASSET_PAGE_BG]		= RGB_ORANGE;
+	asset_rgbs[ASSET_STATE_BG]		= RGB_ORANGE;
 	asset_rgbs[ASSET_PAGE]			= RGB_BLACK;
-	asset_rgbs[ASSET_BAR]			= RGB_WHITE;
+	asset_rgbs[ASSET_BAR]			= RGB_ORANGE;
 	asset_rgbs[ASSET_BAR_BG]		= RGB_BLACK;
 	asset_rgbs[ASSET_BAR_BG_MENU]	= RGB_DARK_GRAY;
 	asset_rgbs[ASSET_UNDERLINE]		= RGB_GRAY;
@@ -777,12 +779,12 @@ int GFX_blitHardwareGroup(SDL_Surface* dst, int show_setting) {
 }
 void GFX_blitHardwareHints(SDL_Surface* dst, int show_setting) {
 	if (BTN_MOD_VOLUME==BTN_SELECT && BTN_MOD_BRIGHTNESS==BTN_START) {
-		if (show_setting==1) GFX_blitButtonGroup((char*[]){ "SELECT","VOLUME",  NULL }, 0, dst, 0);
-		else GFX_blitButtonGroup((char*[]){ "START","BRIGHTNESS",  NULL }, 0, dst, 0);
+		if (show_setting==1) GFX_blitButtonGroup((char*[]){ "SELECT","音量",  NULL }, 0, dst, 0);
+		else GFX_blitButtonGroup((char*[]){ "START","亮度",  NULL }, 0, dst, 0);
 	}
 	else {
-		if (show_setting==1) GFX_blitButtonGroup((char*[]){ BRIGHTNESS_BUTTON_LABEL,"BRIGHTNESS",  NULL }, 0, dst, 0);
-		else GFX_blitButtonGroup((char*[]){ "MENU","BRIGHTNESS",  NULL }, 0, dst, 0);
+		if (show_setting==1) GFX_blitButtonGroup((char*[]){ BRIGHTNESS_BUTTON_LABEL,"亮度",  NULL }, 0, dst, 0);
+		else GFX_blitButtonGroup((char*[]){ "MENU","亮度",  NULL }, 0, dst, 0);
 	}
 	
 }
@@ -1627,8 +1629,8 @@ void PWR_powerOff(void) {
 		gfx.screen = GFX_resize(w,h,p);
 		
 		char* msg;
-		if (HAS_POWER_BUTTON || HAS_POWEROFF_BUTTON) msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off" : "Powering off";
-		else msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npower off now" : "Power off now";
+		if (HAS_POWER_BUTTON || HAS_POWEROFF_BUTTON) msg = exists(AUTO_RESUME_PATH) ? "存档创建完成\n关机" : "关机";
+		else msg = exists(AUTO_RESUME_PATH) ? "存档创建完成\n关机" : "关机";
 		
 		// LOG_info("PWR_powerOff %s (%ix%i)\n", gfx.screen, gfx.screen->w, gfx.screen->h);
 		
