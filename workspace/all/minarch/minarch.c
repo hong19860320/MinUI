@@ -971,6 +971,7 @@ enum {
 	SHORTCUT_CYCLE_EFFECT,
 	SHORTCUT_TOGGLE_FF,
 	SHORTCUT_HOLD_FF,
+	SHORTCUT_SCREENSHOT,
 	SHORTCUT_COUNT,
 };
 
@@ -1236,6 +1237,7 @@ static struct Config {
 		[SHORTCUT_CYCLE_EFFECT]			= {"切换效果",		-1, BTN_ID_NONE, 0},
 		[SHORTCUT_TOGGLE_FF]			= {"切换快进",		-1, BTN_ID_NONE, 0},
 		[SHORTCUT_HOLD_FF]				= {"保持快进",		-1, BTN_ID_NONE, 0},
+		[SHORTCUT_SCREENSHOT]			= {"游戏截图",		-1, BTN_ID_NONE, 0},
 		{NULL}
 	},
 };
@@ -1933,6 +1935,8 @@ static void Menu_afterSleep(void);
 static void Menu_saveState(void);
 static void Menu_loadState(void);
 
+static void Menu_screenshot(void);
+
 static int setFastForward(int enable) {
 	if (!fast_forward && enable && thread_video) {
 		// LOG_info("entered fast forward with threaded core...\n");
@@ -2023,6 +2027,9 @@ static void input_poll_callback(void) {
 						screen_effect += 1;
 						if (screen_effect>=EFFECT_COUNT) screen_effect -= EFFECT_COUNT;
 						Config_syncFrontend(config.frontend.options[FE_OPT_EFFECT].key, screen_effect);
+						break;
+					case SHORTCUT_SCREENSHOT:
+						Menu_screenshot();
 						break;
 					default: break;
 				}
@@ -3341,6 +3348,7 @@ enum {
 	STATUS_CONT =  0,
 	STATUS_SAVE =  1,
 	STATUS_LOAD = 11,
+	STATUS_CAPTURE = 18,
 	STATUS_OPTS = 23,
 	STATUS_DISC = 24,
 	STATUS_QUIT = 30,
@@ -3479,45 +3487,33 @@ typedef struct MenuList {
 	MenuList_callback_t on_change;
 } MenuList;
 
-static int Menu_messageWithFont(char* message, char** pairs, TTF_Font* f) {
+static int Menu_messageWithFont(char* message, char** pairs, TTF_Font* f, int* key) {
 	GFX_setMode(MODE_MAIN);
 	int dirty = 1;
 	while (1) {
 		GFX_startFrame();
 		PAD_poll();
 
-		if (PAD_justPressed(BTN_A) || PAD_justPressed(BTN_B)) break;
-
-		PWR_update(&dirty, NULL, Menu_beforeSleep, Menu_afterSleep);
-
-
-		GFX_clear(screen);
-		GFX_blitMessage(f, message, screen, &(SDL_Rect){SCALE1(PADDING),SCALE1(PADDING),screen->w-SCALE1(2*PADDING),screen->h-SCALE1(PILL_SIZE+PADDING)});
-		GFX_blitButtonGroup(pairs, 0, screen, 1);
-		GFX_flip(screen);
-		dirty = 0;
-
-
-		hdmimon();
-	}
-	GFX_setMode(MODE_MENU);
-	return MENU_CALLBACK_NOP; // TODO: this should probably be an arg
-}
-
-static int Menu_message(char* message, char** pairs) {
-	GFX_setMode(MODE_MAIN);
-	int dirty = 1;
-	while (1) {
-		GFX_startFrame();
-		PAD_poll();
-
-		if (PAD_justPressed(BTN_A) || PAD_justPressed(BTN_B)) break;
+		if (PAD_justPressed(BTN_A)) {
+			if (key) {
+				*key = BTN_A;
+				PAD_reset();
+			}
+			break;
+		}
+		if (PAD_justPressed(BTN_B)) {
+			if (key) {
+				*key = BTN_B;
+				PAD_reset();
+			}
+			break;
+		}
 		
 		PWR_update(&dirty, NULL, Menu_beforeSleep, Menu_afterSleep);
 		
 		if (dirty) {
 			GFX_clear(screen);
-			GFX_blitMessage(font.medium, message, screen, &(SDL_Rect){0,SCALE1(PADDING),screen->w,screen->h-SCALE1(PILL_SIZE+PADDING)});
+			GFX_blitMessage(f, message, screen, &(SDL_Rect){0,SCALE1(PADDING),screen->w,screen->h-SCALE1(PILL_SIZE+PADDING)});
 			GFX_blitButtonGroup(pairs, 0, screen, 1);
 			GFX_flip(screen);
 			dirty = 0;
@@ -3528,6 +3524,14 @@ static int Menu_message(char* message, char** pairs) {
 	}
 	GFX_setMode(MODE_MENU);
 	return MENU_CALLBACK_NOP; // TODO: this should probably be an arg
+}
+
+static int Menu_messageWithKey(char* message, char** pairs, int* key) {
+	return Menu_messageWithFont(message, pairs, font.medium, key);
+}
+
+static int Menu_message(char* message, char** pairs) {
+	return Menu_messageWithFont(message, pairs, font.medium, NULL);
 }
 
 static int Menu_options(MenuList* list);
@@ -3656,7 +3660,7 @@ static int OptionEmulator_openMenu(MenuList* list, int i) {
 		Menu_options(&OptionEmulator_menu);
 	}
 	else {
-		Menu_message("当前核心没有可配置的选项", (char*[]){ "B","BACK", NULL });
+		Menu_message("当前核心没有可配置的选项", (char*[]){ "B","返回", NULL });
 	}
 	
 	return MENU_CALLBACK_NOP;
@@ -3921,7 +3925,7 @@ static int OptionCheats_optionDetail(MenuList* list, int i) {
 	MenuItem* item = &list->items[i];
 	struct Cheat *cheat = &cheatcodes.cheats[i];
 	if (cheat->info)
-		return Menu_message((char*)cheat->info, (char*[]){ "B","返回", NULL });
+		return Menu_message((char*)cheat->info, (char*[]){ "B", "返回", NULL });
 	else return MENU_CALLBACK_NOP;
 }
 
@@ -3988,7 +3992,7 @@ static int OptionCheats_openMenu(MenuList* list, int i) {
 			if (i < count - 1) strcat(cheats_path, "\n");
 		}
 
-		Menu_messageWithFont(cheats_path, (char*[]){ "B","返回", NULL }, font.small);
+		Menu_message(cheats_path, (char*[]){ "B","返回", NULL });
 	}
 	
 	return MENU_CALLBACK_NOP;
@@ -4611,6 +4615,41 @@ static void Menu_loadState(void) {
 		putInt(menu.slot_path, menu.slot);
 		State_read();
 	}
+}
+
+static void Menu_screenshot(void) {
+	// LOG_info("Menu_screenshot\n");
+
+	char rom_name[256];
+	getDisplayName(game.name, rom_name);
+	getAlias(game.path, rom_name);
+
+	time_t now = time(NULL);
+	struct tm *t = localtime(&now);
+	char time_string[100];
+	strftime(time_string, sizeof(time_string), "%Y-%m-%d-%H-%M-%S", t);
+
+	// make sure this actually exists
+	mkdir(SCREENSHOTS_PATH, 0755);
+
+	char screenshot_path[256];
+	sprintf(screenshot_path, SCREENSHOTS_PATH "/%s.%s.png", rom_name, time_string);
+
+	SDL_Surface* bitmap = SDL_CreateRGBSurfaceFrom(renderer.src, renderer.true_w, renderer.true_h, FIXED_DEPTH, renderer.src_p, RGBA_MASK_565);
+	IMG_SavePNG(bitmap, screenshot_path);
+
+	int key = 0;
+	Menu_messageWithKey("截图已保存到目录\n/SDCARD/Screenshots\n是否设置为游戏封面？", (char*[]){ "B","返回", "A","确认", NULL }, &key);
+	if (key == BTN_A) {
+		char *rom_dir = dirname(game.path);
+		char res_dir[256];
+		sprintf(res_dir, "%s/.res", rom_dir);
+		mkdir(res_dir, 0755);
+		char logo_path[256];
+		sprintf(logo_path, "%s/%s.png", res_dir, game.name);
+		IMG_SavePNG(bitmap, logo_path);
+	}
+	SDL_FreeSurface(bitmap);
 }
 
 static bool getAlias(char* path, char* alias) {

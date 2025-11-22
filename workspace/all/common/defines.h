@@ -26,6 +26,8 @@
 #define FAUX_RECENT_PATH SDCARD_PATH "/最近"
 #define COLLECTIONS_PATH SDCARD_PATH "/合集"
 
+#define SCREENSHOTS_PATH SDCARD_PATH "/Screenshots"
+
 #define LAST_PATH "/tmp/last.txt" // transient
 #define CHANGE_DISC_PATH "/tmp/change_disc.txt"
 #define RESUME_SLOT_PATH "/tmp/resume_slot.txt"
