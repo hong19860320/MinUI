@@ -23,8 +23,8 @@
 #define AUTO_RESUME_PATH SHARED_USERDATA_PATH "/.minui/auto_resume.txt"
 #define AUTO_RESUME_SLOT 9
 
-#define FAUX_RECENT_PATH SDCARD_PATH "/Recently Played"
-#define COLLECTIONS_PATH SDCARD_PATH "/Collections"
+#define FAUX_RECENT_PATH SDCARD_PATH "/最近"
+#define COLLECTIONS_PATH SDCARD_PATH "/合集"
 
 #define LAST_PATH "/tmp/last.txt" // transient
 #define CHANGE_DISC_PATH "/tmp/change_disc.txt"
