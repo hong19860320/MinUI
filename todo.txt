@@ -2,7 +2,11 @@ Changes
 
 BASE
 
-- zero28: fixed screen not turning back on after sleep when on lowest brightness (only affects some board revs)
+- my355: fixed right analog stick axes (ht Turro75)
+- rg35xxplus: fixed random mid-poweroff resume on newer ofw (ht anderbubble)
+- miyoomini: separate speaker and headphone volumes (mini flip)
+- miyoomini: added support for usb audio (mini flip)
+- zero28: fixed screen not turning back on after sleep when on lowest brightness (only affects some board revs?)
 
 EXTRAS
 
