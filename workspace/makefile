@@ -7,7 +7,7 @@ PLATFORM=$(UNION_PLATFORM)
 endif
 
 ifeq (,$(PLATFORM))
-$(error please specify PLATFORM, eg. PLATFORM=trimui make)
+$(error please specify PLATFORM, eg. PLATFORM=my355 make)
 endif
 
 ###########################################################
@@ -24,7 +24,7 @@ all:
 	cd ./all/minput/ && make
 	cd ./all/syncsettings/ && make
 	cd ./all/say/ && make
-	cd ./$(PLATFORM)/cores && make
+#   cd ./$(PLATFORM)/cores && make
 	cd ./$(PLATFORM) && make
 
 clean:

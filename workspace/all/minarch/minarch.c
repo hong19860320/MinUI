@@ -4633,10 +4633,10 @@ static void Menu_screenshot(void) {
 	mkdir(SCREENSHOTS_PATH, 0755);
 
 	char screenshot_path[256];
-	sprintf(screenshot_path, SCREENSHOTS_PATH "/%s.%s.png", rom_name, time_string);
+	sprintf(screenshot_path, SCREENSHOTS_PATH "/%s.%s.bmp", rom_name, time_string);
 
 	SDL_Surface* bitmap = SDL_CreateRGBSurfaceFrom(renderer.src, renderer.true_w, renderer.true_h, FIXED_DEPTH, renderer.src_p, RGBA_MASK_565);
-	IMG_SavePNG(bitmap, screenshot_path);
+	SDL_SaveBMP(bitmap, screenshot_path);
 
 	int key = 0;
 	Menu_messageWithKey("截图已保存到目录\n/SDCARD/Screenshots\n是否设置为游戏封面？", (char*[]){ "B","返回", "A","确认", NULL }, &key);
@@ -4646,8 +4646,8 @@ static void Menu_screenshot(void) {
 		sprintf(res_dir, "%s/.res", rom_dir);
 		mkdir(res_dir, 0755);
 		char logo_path[256];
-		sprintf(logo_path, "%s/%s.png", res_dir, game.name);
-		IMG_SavePNG(bitmap, logo_path);
+		sprintf(logo_path, "%s/%s.bmp", res_dir, game.name);
+		SDL_SaveBMP(bitmap, logo_path);
 	}
 	SDL_FreeSurface(bitmap);
 }
