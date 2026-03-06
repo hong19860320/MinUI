@@ -1508,7 +1508,14 @@ int main (int argc, char *argv[]) {
 				
 				sprintf(res_path, "%s/.res/%s.png", res_root, res_name);
 				LOG_info("res_path: %s\n", res_path);
-				if (exists(res_path)) {
+				int has_res_file = exists(res_path);
+				if (!has_res_file) {
+					// Try to use Bitmap format
+					sprintf(res_path, "%s/.res/%s.bmp", res_root, res_name);
+					LOG_info("res_path: %s\n", res_path);
+					has_res_file = exists(res_path);
+				}
+				if (has_res_file) {
 					had_thumb = 1;
 					SDL_Surface* thumb = IMG_Load(res_path);
 					ox = MAX(FIXED_WIDTH - FIXED_HEIGHT, (FIXED_WIDTH - thumb->w));
